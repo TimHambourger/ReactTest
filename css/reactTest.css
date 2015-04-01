@@ -1,0 +1,40 @@
+.container {
+    background: #000;
+    fill: #eee;
+}
+
+.cursor {
+    -webkit-animation: blinking 2s infinite;
+       -moz-animation: blinking 2s infinite;
+         -o-animation: blinking 2s infinite;
+            animation: blinking 2s infinite;
+}
+
+@-webkit-keyframes blinking {
+    0% { fill: #333; }
+    49% { fill: #333; }
+    50% { fill: #eee; }
+    99% { fill: #eee; }
+    100% { fill: #333; }
+}
+@-moz-keyframes blinking {
+    0% { fill: #333; }
+    49% { fill: #333; }
+    50% { fill: #eee; }
+    99% { fill: #eee; }
+    100% { fill: #333; }
+}
+@-o-keyframes blinking {
+    0% { fill: #333; }
+    49% { fill: #333; }
+    50% { fill: #eee; }
+    99% { fill: #eee; }
+    100% { fill: #333; }
+}
+@keyframes blinking {
+    0% { fill: #333; }
+    49% { fill: #333; }
+    50% { fill: #eee; }
+    99% { fill: #eee; }
+    100% { fill: #333; }
+}
