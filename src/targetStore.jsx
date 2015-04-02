@@ -36,9 +36,9 @@ define(function (require) {
     });
 
     // Then, after collision detection has run, update targets and emit change event
-    dispatcher.subscribe(function (message, after) {
+    dispatcher.subscribe(function (message, waitFor) {
         if (message.type !== messageTypes.ADVANCE_TIME) return;
-        return after([subscriptionIds.collisionDetection], function (resolutions) {
+        return waitFor([subscriptionIds.collisionDetection]).then(function (resolutions) {
             var collisionResolution = resolutions[0];
             targets = collisionResolution.targets;
             targetStore.emit(CHANGE_EVENT);
