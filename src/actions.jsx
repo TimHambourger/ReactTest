@@ -4,22 +4,13 @@ define(function (require) {
 
     return {
         setCursorVelocity: function (dx, dy) {
-            dispatcher.dispatch({
-                type: messageTypes.SET_CURSOR_VELOCITY,
-                data: { dx: dx, dy: dy }
-            });
+            dispatcher.dispatch(messageTypes.SET_CURSOR_VELOCITY, { dx: dx, dy: dy });
         },
         fireBullet: function (x, y) {
-            dispatcher.dispatch({
-                type: messageTypes.FIRE_BULLET,
-                data: { x: x, y: y }
-            });
+            dispatcher.dispatch(messageTypes.FIRE_BULLET, { x: x, y: y });
         },
         advanceTime: function (dt) {
-            dispatcher.dispatch({
-                type: messageTypes.ADVANCE_TIME,
-                data: { dt: dt }
-            });
+            dispatcher.dispatch(messageTypes.ADVANCE_TIME, { dt: dt });
         }
     };
 });

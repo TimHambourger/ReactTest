@@ -19,16 +19,15 @@ define(function (require) {
     // Immediately after ADVANCE_TIME message, update all targets
     // But don't emit change event yet
     // Instead, give collision detection a chance to run first
-    subscriptionIds.advanceTargets = dispatcher.subscribe(function (message) {
-        if (message.type !== messageTypes.ADVANCE_TIME) return;
+    subscriptionIds.advanceTargets = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message) {
         var newTargets = [];
         for (var i = 0; i < targets.length; i++) {
             var target = targets[i];
             target.dx += 2 * targetMaxAcceleration * Math.random() - targetMaxAcceleration;
-            target.x += target.dx * message.data.dt;
+            target.x += target.dx * message.dt;
             if (target.x < 0) target.x = target.x + screenWidth;
             if (target.x >= screenWidth) target.x = target.x - screenWidth;
-            target.y += targetDy * message.data.dt;
+            target.y += targetDy * message.dt;
             if (target.y <= screenHeight) newTargets.push(target);
             else targetsMissed++;
         }
@@ -36,8 +35,7 @@ define(function (require) {
     });
 
     // Then, after collision detection has run, update targets and emit change event
-    dispatcher.subscribe(function (message, waitFor) {
-        if (message.type !== messageTypes.ADVANCE_TIME) return;
+    dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
         return waitFor([subscriptionIds.collisionDetection]).then(function (resolutions) {
             var collisionResolution = resolutions[0];
             targets = collisionResolution.targets;

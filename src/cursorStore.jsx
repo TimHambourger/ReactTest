@@ -11,16 +11,14 @@ define(function (require) {
 
     var cursorStore = new EventEmitter();
 
-    dispatcher.subscribe(function (message) {
-        if (message.type !== messageTypes.SET_CURSOR_VELOCITY) return;
-        cursorDx = message.data.dx;
-        cursorDy = message.data.dy;
+    dispatcher.subscribe(messageTypes.SET_CURSOR_VELOCITY, function (message) {
+        cursorDx = message.dx;
+        cursorDy = message.dy;
     });
 
-    dispatcher.subscribe(function (message) {
-        if (message.type !== messageTypes.ADVANCE_TIME) return;
-        cursorX += cursorDx * message.data.dt;
-        cursorY += cursorDy * message.data.dt;
+    dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message) {
+        cursorX += cursorDx * message.dt;
+        cursorY += cursorDy * message.dt;
         if (cursorX >= screenWidth) cursorX = cursorX - screenWidth;
         if (cursorX < 0) cursorX = cursorX + screenWidth;
         if (cursorY + cursorHeight >= screenHeight) cursorY = screenHeight - cursorHeight;

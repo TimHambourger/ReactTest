@@ -9,9 +9,7 @@ define(function (require) {
     return {
         start: function () {
             // On ADVANCE_TIME message, await to bullet and target stores have advanced, then run collision detection
-            subscriptionIds.collisionDetection = dispatcher.subscribe(function (message, waitFor) {
-                if (message.type !== messageTypes.ADVANCE_TIME) return;
-
+            subscriptionIds.collisionDetection = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
                 return waitFor([subscriptionIds.advanceBullets, subscriptionIds.advanceTargets]).then(function () {
                     var bullets = bulletStore.getBullets(),
                         targets = targetStore.getTargets(),
