@@ -1,5 +1,3 @@
-define(function (require) {
-    var Dispatcher = require('Dispatcher');
+var Dispatcher = require('../lib/Dispatcher');
 
-    return new Dispatcher();
-});
+module.exports = new Dispatcher();
