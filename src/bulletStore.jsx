@@ -1,4 +1,4 @@
-var EventEmitter = require('../lib/eventemitter2').EventEmitter2,
+var EventEmitter = require('eventemitter3'),
     messageTypes = require('./messageTypes'),
     dispatcher = require('./appDispatcher'),
     subscriptionIds = require('./subscriptionIds');

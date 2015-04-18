@@ -1,4 +1,4 @@
-var React = require('../lib/react-0.13.1'),
+var React = require('react'),
     actions = require('./actions'),
     Cursor = require('./Cursor'),
     Bullets = require('./Bullets'),
