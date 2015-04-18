@@ -34,7 +34,7 @@ subscriptionIds.advanceBullets = dispatcher.subscribe(messageTypes.ADVANCE_TIME,
 });
 
 // Then, after collision detection has run, update bullets and emit change event
-dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
+subscriptionIds.updateBulletsView = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
     return waitFor([subscriptionIds.collisionDetection]).then(function (resolutions) {
         var collisionResolution = resolutions[0];
         bullets = collisionResolution.bullets;

@@ -4,6 +4,7 @@ var React = require('react'),
     Bullets = require('./Bullets'),
     Targets = require('./Targets'),
     Score = require('./Score'),
+    Perf = require('./Perf'),
     collisionDetection = require('./collisionDetection');
 
 var App = React.createClass({
@@ -30,12 +31,13 @@ var App = React.createClass({
     render: function () {
         return (
             <svg height={this.props.height} width={this.props.width} className="container">
-    			    <Cursor {... this.props} screenHeight={this.props.height} screenWidth={this.props.width} />
+                <Cursor {... this.props} screenHeight={this.props.height} screenWidth={this.props.width} />
                 <Bullets />
                 <Targets screenHeight={this.props.height} screenWidth={this.props.width} targetCount={this.props.targetCount} maxInitialY={this.props.height / 3} />
                 <Score targetCount={this.props.targetCount} />
-    		    </svg>
-    		);
+                <Perf />
+            </svg>
+        );
     }
 });
 

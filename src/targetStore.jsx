@@ -33,7 +33,7 @@ subscriptionIds.advanceTargets = dispatcher.subscribe(messageTypes.ADVANCE_TIME,
 });
 
 // Then, after collision detection has run, update targets and emit change event
-dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
+subscriptionIds.updateTargetsView = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
     return waitFor([subscriptionIds.collisionDetection]).then(function (resolutions) {
         var collisionResolution = resolutions[0];
         targets = collisionResolution.targets;
