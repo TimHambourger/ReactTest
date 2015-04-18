@@ -1,0 +1,22 @@
+{
+  "name": "ReactTest",
+  "version": "0.0.1",
+  "description": "A little Space Invaders game for trying out React",
+  "dependencies": {},
+  "devDependencies": {
+    "browserify": "9.0.8",
+    "es6-promise": "2.1.x",
+    "eventemitter3": "0.1.x",
+    "gulp": "3.8.x",
+    "gulp-uglify": "1.2.x",
+    "react": "0.13.x",
+    "reactify": "1.1.x",
+    "vinyl-buffer": "1.0.x",
+    "vinyl-source-stream": "1.1.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TimHambourger/ReactTest.git"
+  },
+  "author": "Tim Hambourger"
+}
