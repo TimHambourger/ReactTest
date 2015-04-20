@@ -1,55 +1,32 @@
-var EventEmitter = require('eventemitter3'),
-    messageTypes = require('./messageTypes'),
-    dispatcher = require('./appDispatcher'),
-    subscriptionIds = require('./subscriptionIds');
+var ko = require('knockout'),
+    dt = require('./dt');
 
-var CHANGE_EVENT = 'change';
-
-var bullets = [],
+var bullets = ko.observableArray([]),
+    bulletsPreCD = ko.observableArray([]), // bullets after advance time but before collision detection
     currBulletId = 0,
     bulletDy = -1;
 
-var bulletStore = new EventEmitter();
-
-dispatcher.subscribe(messageTypes.FIRE_BULLET, function (message) {
+function fireBullet(x, y) {
     bullets.push({
         id: currBulletId++,
-        x: message.x,
-        y: message.y
+        x: x,
+        y: y
     });
-    bulletStore.emit(CHANGE_EVENT);
-});
+}
 
-// Immediately after ADVANCE_TIME message, update all bullets
-// But don't emit change event yet
-// Instead, give collision detection a chance to run first
-subscriptionIds.advanceBullets = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
-    var newBullets = [];
-    for (var i = 0; i < bullets.length; i++) {
-        var bullet = bullets[i];
-        bullet.y += bulletDy * message.dt;
+dt.subscribe(function (val) {
+    var newBullets = [],
+        currBullets = bullets();
+    for (var i = 0; i < currBullets.length; i++) {
+        var bullet = currBullets[i];
+        bullet.y += bulletDy * val;
         if (bullet.y >= 0) newBullets.push(bullet);
     }
-    bullets = newBullets;
-});
-
-// Then, after collision detection has run, update bullets and emit change event
-subscriptionIds.updateBulletsView = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
-    return waitFor([subscriptionIds.collisionDetection]).then(function (resolutions) {
-        var collisionResolution = resolutions[0];
-        bullets = collisionResolution.bullets;
-        bulletStore.emit(CHANGE_EVENT);
-    });
+    bulletsPreCD(newBullets);
 });
 
 module.exports = {
-    getBullets: function () {
-        return bullets;
-    },
-    addChangeListener: function (callback) {
-        bulletStore.on(CHANGE_EVENT, callback);
-    },
-    removeChangeListener: function (callback) {
-        bulletStore.off(CHANGE_EVENT, callback);
-    }
+    fireBullet: fireBullet,
+    bullets: bullets,
+    bulletsPreCD: bulletsPreCD
 };

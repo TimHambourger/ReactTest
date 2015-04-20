@@ -1,28 +1,20 @@
-var EventEmitter = require('eventemitter3'),
-    messageTypes = require('./messageTypes'),
-    dispatcher = require('./appDispatcher');
-
-var CHANGE_EVENT = 'change';
+var ko = require('knockout'),
+    dt = require('./dt');
 
 var screenWidth, screenHeight, cursorWidth, cursorHeight;
 
-var cursorX, cursorY, cursorDx, cursorDy;
+var cursorX = ko.observable(),
+    cursorY = ko.observable(),
+    cursorDx = ko.observable(),
+    cursorDy = ko.observable();
 
-var cursorStore = new EventEmitter();
-
-dispatcher.subscribe(messageTypes.SET_CURSOR_VELOCITY, function (message) {
-    cursorDx = message.dx;
-    cursorDy = message.dy;
-});
-
-dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message) {
-    cursorX += cursorDx * message.dt;
-    cursorY += cursorDy * message.dt;
-    if (cursorX >= screenWidth) cursorX = cursorX - screenWidth;
-    if (cursorX < 0) cursorX = cursorX + screenWidth;
-    if (cursorY + cursorHeight >= screenHeight) cursorY = screenHeight - cursorHeight;
-    if (cursorY < 0) cursorY = 0;
-    cursorStore.emit(CHANGE_EVENT);
+dt.subscribe(function (val) {
+    cursorX(cursorX() + cursorDx() * val);
+    cursorY(cursorY() + cursorDy() * val);
+    if (cursorX() >= screenWidth) cursorX(cursorX() - screenWidth);
+    if (cursorX() < 0) cursorX(cursorX() + screenWidth);
+    if (cursorY() + cursorHeight >= screenHeight) cursorY(screenHeight - cursorHeight);
+    if (cursorY() < 0) cursorY(0);
 });
 
 module.exports = {
@@ -31,22 +23,17 @@ module.exports = {
         screenHeight = args.screenHeight;
         cursorWidth = args.cursorWidth;
         cursorHeight = args.cursorHeight;
-        cursorX = (screenWidth - cursorWidth) / 2;
-        cursorY = screenHeight - cursorHeight;
-        cursorDx = 0;
-        cursorDy = 0;
+        cursorX((screenWidth - cursorWidth) / 2);
+        cursorY(screenHeight - cursorHeight);
+        cursorDx(0);
+        cursorDy(0);
     },
-    getCursorPos: function () {
-        return { x: cursorX, y: cursorY };
-    },
+    cursorX: cursorX,
+    cursorY: cursorY,
+    cursorDx: cursorDx,
+    cursorDy: cursorDy,
     getCursorWidth: function () {
         return cursorWidth;
-    },
-    addChangeListener: function (callback) {
-        cursorStore.on(CHANGE_EVENT, callback);
-    },
-    removeChangeListener: function (callback) {
-        cursorStore.off(CHANGE_EVENT, callback);
     }
 };
 

@@ -1,10 +1,8 @@
 var React = require('react'),
-    messageTypes = require('./messageTypes'),
-    dispatcher = require('./appDispatcher'),
+    dt = require('./dt'),
     targetStore = require('./targetStore'),
     bulletStore = require('./bulletStore'),
-    subscriptionIds = require('./subscriptionIds'),
-    subId;
+    stateSubscription;
 
 var Perf = React.createClass({
     getInitialState: function () {
@@ -12,20 +10,18 @@ var Perf = React.createClass({
     },
     componentDidMount: function () {
         var self = this;
-        subId = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
-            return waitFor([subscriptionIds.updateBulletsView, subscriptionIds.updateTargetsView]).then(function () {
-                var objs = targetStore.getTargets().length + bulletStore.getBullets().length + 1, // add 1 for the cursor
-                    fps = 1000 / message.dt,
-                    fobjps = fps * objs;
-                self.setState({
-                    fps: Math.round(fps),
-                    fobjps: Math.round(fobjps)
-                });
+        stateSubscription = dt.subscribe(function (val) {
+            var objs = targetStore.targets().length + bulletStore.bullets().length + 1, // add 1 for the cursor
+                fps = 1000 / val,
+                fobjps = fps * objs;
+            self.setState({
+                fps: Math.round(fps),
+                fobjps: Math.round(fobjps)
             });
         });
     },
     componentWillUnmount: function () {
-        dispatcher.unsubscribe(subid);
+        stateSubscription.dispose();
     },
     render: function () {
         return (

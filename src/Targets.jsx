@@ -1,11 +1,11 @@
 var React = require('react'),
+    ko = require('knockout'),
     targetStore = require('./targetStore');
 
-function getTargetsState() {
-    return {
-        targets: targetStore.getTargets()
-    };
-}
+var targetsState = ko.pureComputed(() => ({
+         targets: targetStore.targets()
+    })),
+    stateSubscription;
 
 var Targets = React.createClass({
     propTypes: {
@@ -17,26 +17,22 @@ var Targets = React.createClass({
     getInitialState: function () {
         targetStore.initialize(this.props);
 
-        return getTargetsState();
+        return targetsState();
     },
     componentDidMount: function () {
-        targetStore.addChangeListener(this.onChange);
+        var self = this;
+        stateSubscription = targetsState.subscribe(val => self.setState(val));
     },
     componentWillUnmount: function () {
-        targetStore.removeChangeListener(this.onChange);
-    },
-    onChange: function () {
-        this.setState(getTargetsState());
+        stateSubscription.dispose();
     },
     render: function () {
-        var targets = [];
-
-        for (var i = 0; i < this.state.targets.length; i++) {
-            var target = this.state.targets[i];
-            targets.push(<circle key={target.id} cx={target.x} cy={target.y} r={target.r} className="target" />);
-        }
-
-        return <svg>{targets}</svg>;
+        return (
+            <svg>
+                {this.state.targets.map(target =>
+                    <circle key={target.id} cx={target.x} cy={target.y} r={target.r} className="target" />)}
+            </svg>
+       );
     }
 });
 

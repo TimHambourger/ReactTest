@@ -1,28 +1,26 @@
 var React = require('react'),
+    ko = require('knockout'),
     targetStore = require('./targetStore');
 
-function getScoreState() {
-    return {
-        remaining: targetStore.getTargets().length,
-        missed: targetStore.getTargetsMissed()
-    };
-}
+var scoreState = ko.pureComputed(() => ({
+        remaining: targetStore.targets().length,
+        missed: targetStore.targetsMissed()
+    })),
+    stateSubscription;
 
 var Score = React.createClass({
     propTypes: {
         targetCount: React.PropTypes.number.isRequired
     },
     getInitialState: function () {
-        return getScoreState();
+        return scoreState();
     },
     componentDidMount: function () {
-        targetStore.addChangeListener(this.onChange);
+        var self = this;
+        stateSubscription = scoreState.subscribe(val => self.setState(val));
     },
     componentWillUnmount: function () {
-        targetStore.removeChangeListener(this.onChange);
-    },
-    onChange: function () {
-        this.setState(getScoreState());
+        stateSubscription.dispose();
     },
     render: function () {
         var hit = this.props.targetCount - this.state.remaining - this.state.missed;

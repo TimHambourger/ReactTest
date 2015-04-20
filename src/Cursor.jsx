@@ -1,16 +1,13 @@
 var React = require('react'),
+    ko = require('knockout'),
     KeyCodes = require('./keyCodes'),
-    actions = require('./actions'),
     cursorStore = require('./cursorStore');
 
-function getCursorState() {
-    var cursorPos = cursorStore.getCursorPos();
-
-    return {
-        cursorX: cursorPos.x,
-        cursorY: cursorPos.y
-    };
-}
+var cursorState = ko.pureComputed(() => ({
+        cursorX: cursorStore.cursorX(),
+        cursorY: cursorStore.cursorY()
+    })),
+    stateSubscription;
 
 var Cursor = React.createClass({
     propTypes: {
@@ -22,17 +19,18 @@ var Cursor = React.createClass({
     getInitialState: function () {
         cursorStore.initialize(this.props);
 
-        return getCursorState();
+        return cursorState();
     },
     componentDidMount: function () {
         document.body.addEventListener('keydown', this.handleKeydown);
         document.body.addEventListener('keyup', this.handleKeyup);
-        cursorStore.addChangeListener(this.onChange);
+        var self = this;
+        stateSubscription = cursorState.subscribe(val => self.setState(val));
     },
     componentWillUnmount: function () {
         document.body.removeEventListener('keydown', this.handleKeydown);
         document.body.removeEventListener('keyup', this.handleKeyup);
-        cursorStore.removeChangeListener(this.onChange);
+        stateSubscription.dispose();
     },
     handleKeydown: function (e) {
         var key = e.keyCode || e.which;
@@ -63,21 +61,20 @@ var Cursor = React.createClass({
         dy *= multiplier;
 
         this.currArrowKey = key;
-        actions.setCursorVelocity(dx, dy);
+        cursorStore.cursorDx(dx);
+        cursorStore.cursorDy(dy);
     },
     handleKeyup: function (e) {
         var key = e.keyCode || e.which;
 
         if (key !== this.currArrowKey) return;
-        actions.setCursorVelocity(0, 0);
-    },
-    onChange: function () {
-        this.setState(getCursorState());
+        cursorStore.cursorDx(0);
+        cursorStore.cursorDy(0);
     },
     render: function () {
         return (
-    			<rect x={this.state.cursorX} y={this.state.cursorY} height={this.props.cursorHeight} width={this.props.cursorWidth} className="cursor" />
-    		);
+            <rect x={this.state.cursorX} y={this.state.cursorY} height={this.props.cursorHeight} width={this.props.cursorWidth} className="cursor" />
+        );
     }
 });
 

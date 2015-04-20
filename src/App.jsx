@@ -1,5 +1,5 @@
 var React = require('react'),
-    actions = require('./actions'),
+    dt = require('./dt'),
     Cursor = require('./Cursor'),
     Bullets = require('./Bullets'),
     Targets = require('./Targets'),
@@ -24,7 +24,7 @@ var App = React.createClass({
     },
     advanceTime: function (timestamp) {
         if (!this.lastTimestamp) this.lastTimestamp = timestamp;
-        actions.advanceTime(timestamp - this.lastTimestamp);
+        dt(timestamp - this.lastTimestamp);
         this.lastTimestamp = timestamp;
         this.animationFrame = window.requestAnimationFrame(this.advanceTime);
     },

@@ -1,28 +1,26 @@
 var React = require('react'),
+    ko = require('knockout'),
     KeyCodes = require('./keyCodes'),
-    actions = require('./actions'),
     cursorStore = require('./cursorStore'),
     bulletStore = require('./bulletStore');
 
-function getBulletsState() {
-    return {
-        bullets: bulletStore.getBullets()
-    };
-}
+var bulletsState = ko.pureComputed(() => ({ bullets: bulletStore.bullets() })),
+    stateSubscription;
 
 var Bullets = React.createClass({
     getInitialState: function () {
-        return getBulletsState();
+        return bulletsState();
     },
     componentDidMount: function () {
         document.body.addEventListener('keydown', this.handleKeydown);
         document.body.addEventListener('keyup', this.handleKeyup);
-        bulletStore.addChangeListener(this.onChange);
+        var self = this;
+        stateSubscription = bulletsState.subscribe(val => self.setState(val));
     },
     componentWillUnmount: function () {
         document.body.removeEventListener('keydown', this.handleKeydown);
         document.body.removeEventListener('keyup', this.handleKeyup);
-        bulletStore.removeChangeListener(this.onChange);
+        stateSubscription.dispose();        
     },
     handleKeydown: function (e) {
         var self = this,
@@ -41,23 +39,17 @@ var Bullets = React.createClass({
         clearInterval(this.currAddBulletInterval);
     },
     addBullet: function () {
-        var cursorPos = cursorStore.getCursorPos(),
-            x = cursorPos.x + cursorStore.getCursorWidth() / 2,
-            y = cursorPos.y;
-        actions.fireBullet(x, y);
-    },
-    onChange: function () {
-        this.setState(getBulletsState());
+        var x = cursorStore.cursorX() + cursorStore.getCursorWidth() / 2,
+            y = cursorStore.cursorY();
+        bulletStore.fireBullet(x, y);
     },
     render: function () {
-        var bullets = [];
-
-        for (var i = 0; i < this.state.bullets.length; i++) {
-            var bullet = this.state.bullets[i];
-            bullets.push(<rect key={bullet.id} x={bullet.x} y={bullet.y} height="4" width="1" className="bullet" />);
-        }
-
-        return <svg>{bullets}</svg>;
+        return (
+            <svg>
+                {this.state.bullets.map(bullet =>
+                    <rect key={bullet.id} x={bullet.x} y={bullet.y} height="4" width="1" className="bullet" />)}
+            </svg>
+        );
     }
 });
 

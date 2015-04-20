@@ -1,44 +1,28 @@
-var EventEmitter = require('eventemitter3'),
-    messageTypes = require('./messageTypes'),
-    dispatcher = require('./appDispatcher'),
-    subscriptionIds = require('./subscriptionIds');
+var ko = require('knockout'),
+    dt = require('./dt');
 
-var CHANGE_EVENT = 'change';
-
-var targets = [],
+var targets = ko.observableArray([]),
+    targetsPreCD = ko.observableArray([]), // targets after advance time but before collision detection
     targetDy = .07,
     targetMaxAcceleration = .02,
     targetRadius = 5;
 
-var screenWidth, screenHeight, targetsMissed = 0;
+var screenWidth, screenHeight, targetsMissed = ko.observable(0);
 
-var targetStore = new EventEmitter();
-
-// Immediately after ADVANCE_TIME message, update all targets
-// But don't emit change event yet
-// Instead, give collision detection a chance to run first
-subscriptionIds.advanceTargets = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message) {
-    var newTargets = [];
-    for (var i = 0; i < targets.length; i++) {
-        var target = targets[i];
+dt.subscribe(function (val) {
+    var newTargets = [],
+        currTargets = targets();
+    for (var i = 0; i < currTargets.length; i++) {
+        var target = currTargets[i];
         target.dx += 2 * targetMaxAcceleration * Math.random() - targetMaxAcceleration;
-        target.x += target.dx * message.dt;
+        target.x += target.dx * val;
         if (target.x < 0) target.x = target.x + screenWidth;
         if (target.x >= screenWidth) target.x = target.x - screenWidth;
-        target.y += targetDy * message.dt;
+        target.y += targetDy * val;
         if (target.y <= screenHeight) newTargets.push(target);
-        else targetsMissed++;
+        else targetsMissed(targetsMissed() + 1);
     }
-    targets = newTargets;
-});
-
-// Then, after collision detection has run, update targets and emit change event
-subscriptionIds.updateTargetsView = dispatcher.subscribe(messageTypes.ADVANCE_TIME, function (message, waitFor) {
-    return waitFor([subscriptionIds.collisionDetection]).then(function (resolutions) {
-        var collisionResolution = resolutions[0];
-        targets = collisionResolution.targets;
-        targetStore.emit(CHANGE_EVENT);
-    });
+    targetsPreCD(newTargets);
 });
 
 module.exports = {
@@ -55,16 +39,7 @@ module.exports = {
             });
         }
     },
-    getTargets: function () {
-        return targets;
-    },
-    getTargetsMissed: function () {
-        return targetsMissed;
-    },
-    addChangeListener: function (callback) {
-        targetStore.on(CHANGE_EVENT, callback);
-    },
-    removeChangeListener: function (callback) {
-        bulletStore.off(CHANGE_EVENT, callback);
-    }
+    targets: targets,
+    targetsPreCD: targetsPreCD,
+    targetsMissed: targetsMissed
 };
