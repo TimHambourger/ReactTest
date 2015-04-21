@@ -6,7 +6,7 @@ var React = require('react'),
     subscriptionIds = require('./subscriptionIds'),
     subId,
     avgFobjps = 0, // rolling avg of fobjps value
-    avgWindow = 60; // do as rolling avg of last n values
+    avgWindow = 6; // do as rolling avg of last n values
 
 var Perf = React.createClass({
     getInitialState: function () {
