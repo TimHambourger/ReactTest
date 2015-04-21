@@ -16,8 +16,7 @@ var Score = React.createClass({
         return scoreState();
     },
     componentDidMount: function () {
-        var self = this;
-        stateSubscription = scoreState.subscribe(val => self.setState(val));
+        stateSubscription = scoreState.subscribe(val => this.setState(val));
     },
     componentWillUnmount: function () {
         stateSubscription.dispose();

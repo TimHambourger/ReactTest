@@ -14,8 +14,7 @@ var Bullets = React.createClass({
     componentDidMount: function () {
         document.body.addEventListener('keydown', this.handleKeydown);
         document.body.addEventListener('keyup', this.handleKeyup);
-        var self = this;
-        stateSubscription = bulletsState.subscribe(val => self.setState(val));
+        stateSubscription = bulletsState.subscribe(val => this.setState(val));
     },
     componentWillUnmount: function () {
         document.body.removeEventListener('keydown', this.handleKeydown);

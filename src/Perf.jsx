@@ -9,12 +9,11 @@ var Perf = React.createClass({
         return { fps: 0, fobjps: 0 };
     },
     componentDidMount: function () {
-        var self = this;
-        stateSubscription = dt.subscribe(function (val) {
+        stateSubscription = dt.subscribe(val => {
             var objs = targetStore.targets().length + bulletStore.bullets().length + 1, // add 1 for the cursor
                 fps = 1000 / val,
                 fobjps = fps * objs;
-            self.setState({
+            this.setState({
                 fps: Math.round(fps),
                 fobjps: Math.round(fobjps)
             });

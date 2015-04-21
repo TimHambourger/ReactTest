@@ -24,8 +24,7 @@ var Cursor = React.createClass({
     componentDidMount: function () {
         document.body.addEventListener('keydown', this.handleKeydown);
         document.body.addEventListener('keyup', this.handleKeyup);
-        var self = this;
-        stateSubscription = cursorState.subscribe(val => self.setState(val));
+        stateSubscription = cursorState.subscribe(val => this.setState(val));
     },
     componentWillUnmount: function () {
         document.body.removeEventListener('keydown', this.handleKeydown);

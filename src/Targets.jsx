@@ -20,8 +20,7 @@ var Targets = React.createClass({
         return targetsState();
     },
     componentDidMount: function () {
-        var self = this;
-        stateSubscription = targetsState.subscribe(val => self.setState(val));
+        stateSubscription = targetsState.subscribe(val => this.setState(val));
     },
     componentWillUnmount: function () {
         stateSubscription.dispose();
