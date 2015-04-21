@@ -35,7 +35,7 @@ var App = React.createClass({
                 <Bullets />
                 <Targets screenHeight={this.props.height} screenWidth={this.props.width} targetCount={this.props.targetCount} maxInitialY={this.props.height / 3} />
                 <Score targetCount={this.props.targetCount} />
-                <Perf />
+                <Perf x={this.props.width - 10} />
             </svg>
         );
     }
